@@ -515,12 +515,13 @@
             localStorage.removeItem('gAccessToken');
             localStorage.removeItem('myPasswords'); 
             localStorage.removeItem('myFolders');
-            localStorage.removeItem('appPass'); // Also clear app lock on logout
+            localStorage.removeItem('appPass'); // Clear App Lock
+            localStorage.removeItem('vaultPass'); // Clear Vault Lock
             location.reload(); 
         });
     }
 
-    // --- SYNC ENGINE (AUTO REPAIR + PASSWORD SYNC) ---
+    // --- SYNC ENGINE (AUTO REPAIR + BOTH PASSWORDS) ---
     async function syncFromCloud(silent = false) {
         if(!gAccessToken) return;
         setSyncLoader(true);
@@ -546,7 +547,9 @@
                     if(!silent) showToast("توحيد الملفات...");
                     let mergedAccounts = [...accounts];
                     let mergedFolders = [...folders];
-                    let mergedPass = localStorage.getItem('appPass'); // Start with local
+                    let mergedAppPass = localStorage.getItem('appPass');
+                    let mergedVaultPass = localStorage.getItem('vaultPass');
+                    
                     const processedIds = new Set(accounts.map(a => a.id));
 
                     for (const f of data.files) {
@@ -566,12 +569,18 @@
                             if(fData.folders) {
                                 fData.folders.forEach(fo => { if(!mergedFolders.includes(fo)) mergedFolders.push(fo); });
                             }
-                            if(fData.appPass) mergedPass = fData.appPass; // Cloud pass takes precedence
+                            if(fData.appPass) mergedAppPass = fData.appPass; 
+                            if(fData.vaultPass) mergedVaultPass = fData.vaultPass; 
                         } catch(e) {}
                     }
 
                     const masterFileId = data.files[0].id;
-                    const payload = { accounts: mergedAccounts, folders: mergedFolders, appPass: mergedPass };
+                    const payload = { 
+                        accounts: mergedAccounts, 
+                        folders: mergedFolders, 
+                        appPass: mergedAppPass,
+                        vaultPass: mergedVaultPass 
+                    };
                     const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
                     
                     await fetch(`https://www.googleapis.com/upload/drive/v3/files/${masterFileId}?uploadType=media`, {
@@ -584,7 +593,9 @@
 
                     accounts = mergedAccounts;
                     folders = mergedFolders;
-                    if(mergedPass) localStorage.setItem('appPass', mergedPass);
+                    if(mergedAppPass) localStorage.setItem('appPass', mergedAppPass);
+                    if(mergedVaultPass) localStorage.setItem('vaultPass', mergedVaultPass);
+                    
                     saveToLocal();
                     renderVault();
                     if(!silent) showToast("تم توحيد البيانات ✅");
@@ -599,10 +610,13 @@
                     if (fileResp.ok) {
                         const cloudContent = await fileResp.json();
                         
-                        // Sync Password
-                        if(cloudContent.appPass) {
-                            localStorage.setItem('appPass', cloudContent.appPass);
-                        }
+                        // Sync App Password
+                        if(cloudContent.appPass) localStorage.setItem('appPass', cloudContent.appPass);
+                        else localStorage.removeItem('appPass');
+
+                        // Sync Vault Password (Added)
+                        if(cloudContent.vaultPass) localStorage.setItem('vaultPass', cloudContent.vaultPass);
+                        else localStorage.removeItem('vaultPass');
 
                         if(cloudContent && Array.isArray(cloudContent.accounts)) {
                             const localIds = new Set(accounts.map(a => a.id));
@@ -636,7 +650,7 @@
         setSyncLoader(false);
     }
 
-    // --- UPLOAD ENGINE (INCLUDES PASSWORD) ---
+    // --- UPLOAD ENGINE (INCLUDES ALL PASSWORDS) ---
     async function uploadToDrive(silent = true, deletedId = null) {
         if(!gAccessToken) return;
         setSyncLoader(true);
@@ -682,11 +696,12 @@
                 }
             }
 
-            // Include App Password in Payload
+            // Include Both Passwords in Payload
             const payload = { 
                 accounts: finalAccounts, 
                 folders: finalFolders,
-                appPass: localStorage.getItem('appPass') // Sync the lock password
+                appPass: localStorage.getItem('appPass'),
+                vaultPass: localStorage.getItem('vaultPass') 
             };
             
             const fileBlob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
@@ -1141,7 +1156,7 @@
                 if(v === appPass) { 
                     localStorage.removeItem('appPass'); 
                     showToast("تم إزالة القفل 🔓");
-                    uploadToDrive(); // Sync removal to cloud
+                    uploadToDrive(); // Sync removal
                 }
                 else showToast("خطأ في الرمز");
             });
@@ -1150,7 +1165,7 @@
                 if(v) { 
                     localStorage.setItem('appPass', v); 
                     showToast("تم القفل 🔒");
-                    uploadToDrive(); // Sync new pass to cloud
+                    uploadToDrive(); // Sync new pass
                 } 
             });
         }
@@ -1197,8 +1212,20 @@
     function cancelVaultPress() { clearTimeout(vaultPressTimer); }
     function handleVaultLongPress() {
         const vp = localStorage.getItem('vaultPass');
-        if(vp) openPasswordModal("إزالة قفل الخزنة", v => { if(v===vp){ localStorage.removeItem('vaultPass'); showToast("تم الإلغاء"); } else showToast("خطأ"); });
-        else openPasswordModal("قفل الخزنة", v => { if(v){ localStorage.setItem('vaultPass', v); showToast("تم القفل"); } });
+        if(vp) openPasswordModal("إزالة قفل الخزنة", v => { 
+            if(v===vp){ 
+                localStorage.removeItem('vaultPass'); 
+                showToast("تم الإلغاء"); 
+                uploadToDrive(); // Sync removal
+            } else showToast("خطأ"); 
+        });
+        else openPasswordModal("قفل الخزنة", v => { 
+            if(v){ 
+                localStorage.setItem('vaultPass', v); 
+                showToast("تم القفل");
+                uploadToDrive(); // Sync new pass
+            } 
+        });
     }
     function openVaultCheck() {
         if(isLongPress) return;
