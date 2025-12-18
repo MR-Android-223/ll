@@ -515,8 +515,7 @@
         }
     }
 
-    // --- SYNC ENGINE (FIXED) ---
-    // Fix: Using unique query parameter ONLY (safest way to bypass cache without breaking CORS)
+    // --- SYNC ENGINE (CORRECTED DELETE LOGIC) ---
     async function syncFromCloud(silent = false) {
         if(!gAccessToken) return;
         setSyncLoader(true);
@@ -526,7 +525,6 @@
             const unique = new Date().getTime();
             const q = `name = '${FILENAME}' and 'appDataFolder' in parents and trashed = false`;
             
-            // 1. Fetch File List
             const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&cb=${unique}`, {
                 headers: { 'Authorization': `Bearer ${gAccessToken}` }
             });
@@ -598,6 +596,7 @@
                             const localIds = new Set(accounts.map(a => a.id));
                             let addedCount = 0;
                             
+                            // MERGE: Add new items from Cloud
                             cloudContent.accounts.forEach(acc => {
                                 if(!localIds.has(acc.id)) { 
                                     accounts.push(acc); 
@@ -605,6 +604,7 @@
                                 }
                             });
                             
+                            // SYNC FOLDERS
                             const localFolders = new Set(folders);
                             (cloudContent.folders || []).forEach(f => {
                                 if(!localFolders.has(f)) { folders.push(f); }
@@ -626,8 +626,8 @@
         setSyncLoader(false);
     }
 
-    // --- UPLOAD ENGINE ---
-    async function uploadToDrive(silent = true) {
+    // --- UPLOAD ENGINE (WITH DELETED ID PARAMETER) ---
+    async function uploadToDrive(silent = true, deletedId = null) {
         if(!gAccessToken) return;
         setSyncLoader(true);
         if(!silent) showToast("جاري الرفع...");
@@ -656,7 +656,10 @@
                     if(cloudData && cloudData.accounts) {
                         const localIds = new Set(accounts.map(a => a.id));
                         cloudData.accounts.forEach(cAcc => {
-                            if(!localIds.has(cAcc.id)) finalAccounts.push(cAcc);
+                            // HERE IS THE MAGIC: If not in local AND not the specific deleted item, keep it.
+                            if(!localIds.has(cAcc.id) && cAcc.id !== deletedId) {
+                                finalAccounts.push(cAcc);
+                            }
                         });
                         const localFolderSet = new Set(folders);
                         (cloudData.folders || []).forEach(cF => {
@@ -692,6 +695,7 @@
                 });
             }
 
+            // Important: Update local state to reflect the merged final state
             accounts = finalAccounts;
             folders = finalFolders;
             saveToLocal();
@@ -1078,10 +1082,12 @@
             if (action === 'copy') copyToClipboard(currentCtxType === 'email' ? acc.email : acc.pass);
             else if (action === 'delete') {
                 customConfirm("حذف نهائي؟", () => {
-                    accounts = accounts.filter(a => a.id !== currentCtxId);
-                    saveToLocal(); 
-                    uploadToDrive(); 
-                    renderVault(); 
+                    const idToDelete = currentCtxId; // Capture ID
+                    accounts = accounts.filter(a => a.id !== idToDelete); // Delete Local
+                    saveToLocal();
+                    renderVault();
+                    // Pass the ID to uploadToDrive so it knows not to resurrect it
+                    uploadToDrive(false, idToDelete); 
                     showToast("تم الحذف");
                 });
             } else if (action === 'edit') {
