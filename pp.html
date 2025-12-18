@@ -515,21 +515,27 @@
         }
     }
 
-    // --- SYNC ENGINE (AUTO REPAIR + CACHE BUSTER) ---
+    // --- SYNC ENGINE (ULTRA AGGRESSIVE ANTI-CACHE) ---
     async function syncFromCloud(silent = false) {
         if(!gAccessToken) return;
         setSyncLoader(true);
-        if(!silent) showToast("جاري التحديث...");
+        if(!silent) showToast("جاري جلب أحدث نسخة...");
         
         try {
-            // FIX: Unique Cache Buster to force new request
-            const unique = Date.now() + Math.random();
+            // FIX: Strongest possible headers to bypass browser cache
+            const noCacheHeaders = {
+                'Authorization': `Bearer ${gAccessToken}`,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            };
+
+            const unique = new Date().getTime(); // Unique number every time
             const q = `name = '${FILENAME}' and 'appDataFolder' in parents and trashed = false`;
             
-            // 1. Fetch File List (No Cache)
-            const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&cb=${unique}`, {
-                headers: { 'Authorization': `Bearer ${gAccessToken}` },
-                cache: 'no-store' 
+            // 1. Fetch File List
+            const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&nocache=${unique}`, {
+                headers: noCacheHeaders
             });
             
             if(searchResp.status === 401) { 
@@ -537,21 +543,20 @@
             }
             const data = await searchResp.json();
 
-            // *** Auto-Repair Logic ***
+            // *** Auto-Repair & Sync ***
             if (data.files && data.files.length > 0) {
                 
+                // Handle Duplicates
                 if (data.files.length > 1) {
                     if(!silent) showToast("توحيد الملفات...");
-                    // Merge duplicates logic (Keep best of all)
                     let mergedAccounts = [...accounts];
                     let mergedFolders = [...folders];
                     const processedIds = new Set(accounts.map(a => a.id));
 
                     for (const f of data.files) {
                         try {
-                             const fResp = await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&cb=${unique}`, {
-                                headers: { 'Authorization': `Bearer ${gAccessToken}` },
-                                cache: 'no-store'
+                             const fResp = await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&nocache=${unique}`, {
+                                headers: noCacheHeaders
                             });
                             const fData = await fResp.json();
                             if(fData.accounts) {
@@ -568,7 +573,6 @@
                         } catch(e) {}
                     }
 
-                    // Upload Master & Clean
                     const masterFileId = data.files[0].id;
                     const payload = { accounts: mergedAccounts, folders: mergedFolders };
                     const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
@@ -588,35 +592,37 @@
                     if(!silent) showToast("تم توحيد البيانات ✅");
 
                 } else {
-                    // Normal Single File Sync
+                    // Normal Sync
                     const fileId = data.files[0].id;
-                    const fileResp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&cb=${unique}`, {
-                        headers: { 'Authorization': `Bearer ${gAccessToken}` },
-                        cache: 'no-store'
+                    const fileResp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&nocache=${unique}`, {
+                        headers: noCacheHeaders
                     });
-                    const cloudContent = await fileResp.json();
                     
-                    if(cloudContent && Array.isArray(cloudContent.accounts)) {
-                        const localIds = new Set(accounts.map(a => a.id));
-                        let addedCount = 0;
+                    if (fileResp.ok) {
+                        const cloudContent = await fileResp.json();
                         
-                        cloudContent.accounts.forEach(acc => {
-                            if(!localIds.has(acc.id)) { 
-                                accounts.push(acc); 
-                                addedCount++; 
-                            }
-                        });
-                        
-                        const localFolders = new Set(folders);
-                        (cloudContent.folders || []).forEach(f => {
-                            if(!localFolders.has(f)) { folders.push(f); }
-                        });
+                        if(cloudContent && Array.isArray(cloudContent.accounts)) {
+                            const localIds = new Set(accounts.map(a => a.id));
+                            let addedCount = 0;
+                            
+                            cloudContent.accounts.forEach(acc => {
+                                if(!localIds.has(acc.id)) { 
+                                    accounts.push(acc); 
+                                    addedCount++; 
+                                }
+                            });
+                            
+                            const localFolders = new Set(folders);
+                            (cloudContent.folders || []).forEach(f => {
+                                if(!localFolders.has(f)) { folders.push(f); }
+                            });
 
-                        if(addedCount > 0) {
-                            saveToLocal(); renderVault();
-                            if(!silent) showToast(`تم جلب ${addedCount} عنصر جديد ✅`);
-                        } else if(!silent) {
-                            showToast("لا توجد تغييرات جديدة");
+                            if(addedCount > 0) {
+                                saveToLocal(); renderVault();
+                                if(!silent) showToast(`تم جلب ${addedCount} عنصر جديد ✅`);
+                            } else if(!silent) {
+                                showToast("لا توجد تغييرات جديدة");
+                            }
                         }
                     }
                 }
@@ -634,11 +640,17 @@
         if(!silent) showToast("جاري الرفع...");
         
         try {
-            const unique = Date.now() + Math.random();
+            const noCacheHeaders = {
+                'Authorization': `Bearer ${gAccessToken}`,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            };
+            const unique = new Date().getTime();
             const q = `name = '${FILENAME}' and 'appDataFolder' in parents and trashed = false`;
-            const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&cb=${unique}`, {
-                headers: { 'Authorization': `Bearer ${gAccessToken}` },
-                cache: 'no-store'
+            
+            const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&nocache=${unique}`, {
+                headers: noCacheHeaders
             });
             const data = await searchResp.json();
 
@@ -649,21 +661,21 @@
             if (data.files && data.files.length > 0) {
                 targetFileId = data.files[0].id;
                 
-                const cloudResp = await fetch(`https://www.googleapis.com/drive/v3/files/${targetFileId}?alt=media&cb=${unique}`, {
-                    headers: { 'Authorization': `Bearer ${gAccessToken}` },
-                    cache: 'no-store'
+                const cloudResp = await fetch(`https://www.googleapis.com/drive/v3/files/${targetFileId}?alt=media&nocache=${unique}`, {
+                    headers: noCacheHeaders
                 });
-                const cloudData = await cloudResp.json();
-
-                if(cloudData && cloudData.accounts) {
-                    const localIds = new Set(accounts.map(a => a.id));
-                    cloudData.accounts.forEach(cAcc => {
-                        if(!localIds.has(cAcc.id)) finalAccounts.push(cAcc);
-                    });
-                    const localFolderSet = new Set(folders);
-                    (cloudData.folders || []).forEach(cF => {
-                        if(!localFolderSet.has(cF)) finalFolders.push(cF);
-                    });
+                if(cloudResp.ok) {
+                    const cloudData = await cloudResp.json();
+                    if(cloudData && cloudData.accounts) {
+                        const localIds = new Set(accounts.map(a => a.id));
+                        cloudData.accounts.forEach(cAcc => {
+                            if(!localIds.has(cAcc.id)) finalAccounts.push(cAcc);
+                        });
+                        const localFolderSet = new Set(folders);
+                        (cloudData.folders || []).forEach(cF => {
+                            if(!localFolderSet.has(cF)) finalFolders.push(cF);
+                        });
+                    }
                 }
                 
                 if(data.files.length > 1) {
