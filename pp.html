@@ -7,11 +7,12 @@
     
     <!-- مكتبة جوجل -->
     <script src="https://accounts.google.com/gsi/client" onload="initGoogleLib()" async defer></script>
+    <!-- الخطوط -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #1a73e8; /* تم تعديل اللون ليتناسب مع ستايل جوجل */
+            --primary: #1a73e8; 
             --primary-dark: #1765cc;
             --bg: #f0f2f5;
             --surface: #ffffff;
@@ -32,31 +33,36 @@
             padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* --- تصميم صفحة الدخول الجديد (حسب طلبك) --- */
+        /* --- تصميم صفحة الدخول (الجديد) --- */
         #loginOverlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: #f0f2f5;
+            background-color: #f0f2f5;
             z-index: 2000; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            padding: 20px; text-align: center;
+            padding: 20px;
         }
 
         .login-card {
-            background: white; padding: 40px; border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;
-            width: 100%; max-width: 400px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .google-logo { width: 75px; margin-bottom: 10px; }
-        
+
         .login-card h2 {
-            font-size: 24px; font-weight: 400; margin-bottom: 8px;
-            color: #202124; margin-top: 0; font-family: 'Tajawal', sans-serif;
+            font-size: 24px; font-weight: 400; margin-bottom: 8px; color: #202124; margin-top: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .login-card p {
-            color: #5f6368; margin-bottom: 30px; font-family: 'Tajawal', sans-serif;
+            color: #5f6368; margin-bottom: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .google-btn {
@@ -67,30 +73,28 @@
             transition: background-color 0.3s; text-decoration: none;
             font-family: 'Segoe UI', sans-serif;
         }
-        
-        .google-btn-content {
-            display: flex; align-items: center; justify-content: center;
-            width: 100%; padding: 10px; gap: 10px;
-        }
 
         .google-btn:hover { background-color: #1765cc; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
         .google-icon-wrapper {
             background: white; padding: 8px; border-radius: 2px;
+            margin-left: 1px; /* تعديل بسيط للمسافة */
             display: flex; align-items: center; justify-content: center;
-            height: 38px; width: 38px;
+            height: 38px; width: 38px; margin: 1px;
         }
 
         .google-icon { width: 18px; height: 18px; }
+        
+        .btn-text { flex: 1; text-align: center; }
 
         .footer-links {
-            margin-top: 40px; display: flex; justify-content: space-between;
-            font-size: 13px; font-family: 'Tajawal', sans-serif;
+            margin-top: 40px; display: flex; justify-content: space-between; font-size: 13px;
         }
-        .footer-links a { color: #1a73e8; text-decoration: none; }
+
+        .footer-links a { color: #1a73e8; text-decoration: none; font-family: 'Segoe UI', sans-serif; }
 
 
-        /* --- بقية التطبيق --- */
+        /* --- بقية ستايل التطبيق --- */
         header {
             height: var(--header-height); padding: 0 20px;
             display: grid; grid-template-columns: 45px 1fr 45px;
@@ -129,10 +133,8 @@
         .delete-item { color: var(--danger); }
         .sync-item { background: #f0f9ff; color: var(--primary-dark); } 
 
-        /* تنسيق صورة المستخدم في القائمة */
         .user-profile-img {
-            width: 24px; height: 24px; border-radius: 50%; object-fit: cover;
-            border: 1px solid #ddd;
+            width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd;
         }
 
         .container {
@@ -293,7 +295,7 @@
 </head>
 <body oncontextmenu="return false;">
 
-<!-- شاشة الدخول الجديدة بالتصميم المطلوب -->
+<!-- صفحة الدخول بالتصميم الجديد (مطابق للصورة) -->
 <div id="loginOverlay">
     <div class="login-card">
         <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="google-logo">
@@ -301,15 +303,13 @@
         <h2>تسجيل الدخول</h2>
         <p>المتابعة إلى حسابك</p>
 
-        <!-- جعلت الزر يشغل دالة بدء الدخول -->
-        <div class="google-btn" onclick="startGoogleLogin()">
+        <!-- تم تحويل الزر ليشغل دالة الدخول -->
+        <a href="#" class="google-btn" onclick="event.preventDefault(); startGoogleLogin()">
             <div class="google-icon-wrapper">
                 <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G logo"/>
             </div>
-            <div class="google-btn-content">
-                <span>المتابعة باستخدام Google</span>
-            </div>
-        </div>
+            <span class="btn-text">المتابعة باستخدام Google</span>
+        </a>
 
         <div class="footer-links">
             <a href="#">إنشاء حساب</a>
@@ -361,7 +361,7 @@
         <div class="menu-item delete-item" onclick="handleLogout()" style="border-top:1px solid #f0f0f0">
             <span>تسجيل الخروج</span>
             <div id="logoutIconArea">
-                <!-- هنا ستظهر الصورة -->
+                <!-- صورة المستخدم ستظهر هنا -->
                 <svg style="width:20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline></svg>
             </div>
         </div>
@@ -416,7 +416,7 @@
 
     <div id="vaultList"></div>
     
-    <!-- تم إضافة زر الحذف هنا -->
+    <!-- زر الحذف المضاف -->
     <div id="bottomBar" class="bottom-action-bar">
         <span id="selectedCount" style="min-width: 60px;">0 محدد</span>
         
@@ -556,27 +556,22 @@
                         localStorage.setItem('gAccessToken', gAccessToken);
                         document.getElementById('loginOverlay').style.display = 'none';
                         showToast("تم الدخول ✅");
-                        fetchUserInfo(); // جلب صورة المستخدم
+                        fetchUserInfo(); 
                         syncFromCloud(true); 
                     }
                 }
             });
-            // محاولة استعادة الجلسة تلقائياً عند فتح التطبيق
             tryRestoreSession();
         }
     }
 
-    // --- حل مشكلة تسجيل الدخول اليومي (Silent Refresh) ---
+    // --- حل مشكلة تسجيل الدخول اليومي ---
     function tryRestoreSession() {
         if(gAccessToken) {
-            // لدينا توكن، نجرب استخدامه
             document.getElementById('loginOverlay').style.display = 'none';
-            fetchUserInfo(); // عرض الصورة المحفوظة أو جلبها
+            fetchUserInfo(); 
             syncFromCloud(true);
         } else {
-            // لا يوجد توكن، أو انتهى، نحاول جلبه بصمت
-            // ملاحظة: هذا يعمل إذا كان المستخدم مسجل دخوله في المتصفح
-            // prompt: 'none' تمنع ظهور النافذة إذا لم يكن مسجلاً
             if(tokenClient) {
                 tokenClient.requestAccessToken({prompt: 'none'});
             }
@@ -589,9 +584,7 @@
     }
 
     async function fetchUserInfo() {
-        // جلب الصورة
         if(!gAccessToken) return;
-        // التحقق أولاً إذا الصورة محفوظة محلياً لعدم تكرار الطلب
         const localPic = localStorage.getItem('userPhoto');
         if(localPic) updateLogoutIcon(localPic);
 
@@ -624,7 +617,7 @@
             localStorage.removeItem('myFolders');
             localStorage.removeItem('appPass'); 
             localStorage.removeItem('vaultPass'); 
-            localStorage.removeItem('userPhoto'); // حذف الصورة
+            localStorage.removeItem('userPhoto'); 
             location.reload(); 
         });
     }
@@ -643,9 +636,7 @@
                 headers: { 'Authorization': `Bearer ${gAccessToken}` }
             });
             
-            // --- حل مشكلة انتهاء التوكن (401) ---
             if(searchResp.status === 401) { 
-                // التوكن انتهى، نحاول تجديده بصمت
                 console.log("Token expired, refreshing...");
                 localStorage.removeItem('gAccessToken');
                 gAccessToken = null;
@@ -656,7 +647,6 @@
 
             if (data.files && data.files.length > 0) {
                 if (data.files.length > 1) {
-                    // Logic to merge duplicates (same as before)
                     if(!silent) showToast("توحيد الملفات...");
                     let mergedAccounts = [...accounts];
                     let mergedFolders = [...folders];
@@ -1034,23 +1024,14 @@
         renderVault();
     }
     
-    // --- دالة الحذف الجماعي الجديدة ---
     function deleteSelected() {
         if(selectedIds.size === 0) return;
         customConfirm(`هل أنت متأكد من حذف ${selectedIds.size} عنصر؟`, () => {
-             // نسخ الـ IDs للحذف قبل تفريغ المجموعة
              const idsToDelete = Array.from(selectedIds);
-             
-             // حذف محلي
              accounts = accounts.filter(acc => !selectedIds.has(acc.id));
              saveToLocal();
-             
-             // إرسال طلب الحذف للسحابة (نقوم برفع النسخة الجديدة، 
-             // لكن الأفضل لو نتمكن من تمرير الـ IDs المحذوفة إذا أردنا دقة عالية في المزامنة)
-             // في هذه الحالة البسيطة، الرفع سيفي بالغرض لأننا سنستبدل القائمة
              uploadToDrive(false); 
-             
-             toggleSelectionMode(); // الخروج من وضع التحديد
+             toggleSelectionMode(); 
              renderVault();
              showToast("تم الحذف ✅");
         });
@@ -1258,7 +1239,6 @@
         
         document.getElementById('lockMenuText').innerText = appPass ? "إلغاء قفل التطبيق" : "تعيين قفل للتطبيق";
         
-        // التأكد من وجود الصورة إذا كانت محفوظة
         const savedPic = localStorage.getItem('userPhoto');
         if(savedPic) updateLogoutIcon(savedPic);
 
