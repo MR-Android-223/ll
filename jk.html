@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>خزنة أسراري</title>
+    <script src="https://accounts.google.com/gsi/client" onload="initGoogleLib()" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --bg: #f9fafb;
+            --surface: #ffffff;
+            --text: #374151;
+            --gray-border: #e5e7eb;
+            --danger: #ef4444;
+            --header-height: 70px;
+        }
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg);
+            margin: 0; padding: 0; color: var(--text);
+            height: 100vh; height: -webkit-fill-available;
+            overflow-x: hidden; display: flex; flex-direction: column;
+            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: #f8f9fa;
+            z-index: 2000; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .google-logo { width: 75px; margin-bottom: 10px; }
+
+        .login-card h2 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 24px; font-weight: 500; margin-bottom: 8px; color: #202124; margin-top: 0;
+        }
+
+        .login-card p {
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px; color: #202124; margin-bottom: 30px;
+        }
+
+        .input-group { margin-bottom: 15px; text-align: right; }
+
+        .login-input {
+            width: 100%; padding: 13px 15px;
+            border: 1px solid #dadce0; border-radius: 4px;
+            font-size: 16px; transition: border 0.2s;
+            font-family: 'Cairo', sans-serif;
+            background: #fff; color: #202124;
+        }
+
+        .login-input:focus { outline: none; border: 2px solid #1a73e8; padding: 12px 14px; }
+
+        .btn-login-primary {
+            background-color: #1a73e8; color: white; border: none;
+            padding: 10px 24px; border-radius: 4px; font-weight: 600;
+            cursor: pointer; width: 100%; font-size: 14px; margin-top: 20px;
+            transition: background 0.3s; font-family: 'Cairo', sans-serif;
+        }
+
+        .btn-login-primary:hover {
+            background-color: #1765cc;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+
+        .separator {
+            display: flex; align-items: center; text-align: center;
+            margin: 20px 0; color: #70757a; font-family: 'Cairo', sans-serif;
+        }
+        .separator::before, .separator::after { content: ''; flex: 1; border-bottom: 1px solid #dadce0; }
+        .separator:not(:empty)::before { margin-left: .5em; }
+        .separator:not(:empty)::after { margin-right: .5em; }
+
+        .google-btn {
+            display: flex; align-items: center; justify-content: center;
+            background-color: #ffffff; border: 1px solid #dadce0;
+            color: #3c4043; padding: 10px; border-radius: 4px;
+            cursor: pointer; width: 100%; font-weight: 600;
+            font-size: 14px; transition: background-color 0.2s;
+            font-family: 'Cairo', sans-serif;
+        }
+        .google-btn:hover { background-color: #f7f8f8; border-color: #d2e3fc; }
+        .google-btn img { width: 20px; margin-left: 10px; }
+
+        .footer-links { display: flex; justify-content: space-between; margin-top: 40px; font-size: 14px; }
+        .footer-links a { color: #1a73e8; text-decoration: none; font-weight: 600; font-family: 'Cairo', sans-serif; }
+        
+        /* --- تصميم المحفوظات --- */
+        #vaultPage {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f9fafb; z-index: 200; display: none; flex-direction: column;
+            overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .bottom-action-bar {
+            position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); 
+            left: 50%; transform: translateX(-50%) translateY(150px);
+            background: #1f2937; color: white; padding: 12px 25px; border-radius: 30px;
+            display: flex; gap: 15px; align-items: center; z-index: 300; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .bottom-action-bar.visible { transform: translateX(-50%) translateY(0); }
+
+        .toast {
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+            background: #1f2937; color: white; padding: 10px 20px; border-radius: 30px;
+            font-size: 14px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 3000;
+            white-space: nowrap;
+        }
+
+        /* --- تحسينات قائمة السياق --- */
+        .action-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 18px 25px; border-bottom: 1px solid #f3f4f6; cursor: pointer; color: #374151; font-weight: 500;
+        }
+
+        .action-item:last-child { border-bottom: none; color: var(--danger); }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<!-- شاشة الدخول الجديدة -->
+<div id="loginOverlay">
+    <div class="login-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="google-logo">
+        <h2>تسجيل الدخول</h2>
+        <p>استخدام حسابك على Google</p>
+        <form onsubmit="event.preventDefault(); startGoogleLogin();">
+            <div class="input-group">
+                <input type="text" class="login-input" placeholder="البريد الإلكتروني أو الهاتف">
+            </div>
+            <div class="input-group">
+                <input type="password" class="login-input" placeholder="كلمة المرور">
+            </div>
+            <button type="submit" class="btn-login-primary">التالي</button>
+        </form>
+        <div class="separator">أو</div>
+        <button class="google-btn" onclick="startGoogleLogin()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Check_Logo.svg" alt="Google Icon">
+            تسجيل الدخول بواسطة Google
+        </button>
+    </div>
+</div>
+
+<!-- باقي المحتوى والصفحات -->
+<script>
+    // متغيرات ووظائف جافا سكربت لحل المشكلات
+    let longPressTimer;
+    let isLongPress = false;
+    function startPress(type, id) {
+        isLongPress = false;
+        longPressTimer = setTimeout(() => { isLongPress = true; openContextMenu(type, id); }, 800);
+    }
+    
+    function cancelPress() {
+        clearTimeout(longPressTimer);
+        if (!isLongPress) {
+            handleCardClick(currentCtxId);
+        }
+    }
+
+    function openContextMenu(type, id) {
+        if (isLongPress) {
+            currentCtxId = id;
+            currentCtxType = type;
+            showOverlay('contextModal');
+        }
+    }
+
+    function ctxAction(action) {
+        goBack();
+        const acc = accounts.find(a => a.id === currentCtxId);
+        setTimeout(() => {
+            if (!acc) return;
+            if (action === 'delete') {
+                customConfirm("حذف جميع البيانات المحددة؟", () => {
+                    const selectedIdsArr = Array.from(selectedIds);
+                    accounts = accounts.filter(a => !selectedIdsArr.includes(a.id)); 
+                    saveToLocal();
+                    renderVault();
+                    showToast("تم الحذف");
+                    uploadToDrive();
+                });
+            }
+        }, 200);
+    }
+
+    function toggleSelectionMode() {
+        isSelectionMode = !isSelectionMode;
+        selectedIds.clear();
+        const btn = document.getElementById('selectToggleBtn');
+        const bottomBar = document.getElementById('bottomBar');
+        if (isSelectionMode) {
+            btn.classList.add('active');
+            bottomBar.classList.add('visible');
+            document.getElementById('selectedCount').innerText = "0 محدد";
+        } else {
+            btn.classList.remove('active');
+            bottomBar.classList.remove('visible');
+        }
+        renderVault();
+    }
+
+    function showToast(m) {
+        const t=document.getElementById('toast');
+        t.innerText=m;
+        t.style.opacity='1';
+        setTimeout(()=>t.style.opacity='0',2000);
+    }
+
+    // مزامنة ورفع البيانات
+    async function uploadToDrive(silent = true, deletedId = null) {
+        if (!gAccessToken) return;
+        setSyncLoader(true);
+        if (!silent) showToast("جاري الرفع...");
+        try {
+            const unique = new Date().getTime();
+            const q = `name = '${FILENAME}' and 'appDataFolder' in parents and trashed = false`;
+            const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&cb=${unique}`, {
+                headers: { 'Authorization': `Bearer ${gAccessToken}` }
+            });
+            const data = await searchResp.json();
+            // أكواد رفع البيانات
+        } catch (e) {
+            console.error(e);
+            showToast("فشل الرفع! ❌");
+        }
+        setSyncLoader(false);
+    }
+</script>
+
+</body>
+</html>
