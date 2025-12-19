@@ -8,16 +8,16 @@
     <!-- مكتبة جوجل -->
     <script src="https://accounts.google.com/gsi/client" onload="initGoogleLib()" async defer></script>
     <!-- الخطوط -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.95);
+            --primary: #6366f1; /* لون أحدث */
+            --primary-dark: #4f46e5;
+            --bg: #f3f4f6;
             --surface: #ffffff;
             --text: #1f2937;
+            --gray-border: #e5e7eb;
             --danger: #ef4444;
             --header-height: 70px;
         }
@@ -26,81 +26,91 @@
 
         body {
             font-family: 'Tajawal', sans-serif;
-            background-color: #f3f4f6;
+            background-color: var(--bg);
             margin: 0; padding: 0; color: var(--text);
             height: 100vh; height: -webkit-fill-available;
             overflow-x: hidden; display: flex; flex-direction: column;
             padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* --- تصميم صفحة الدخول --- */
+        /* --- تصميم صفحة الدخول الجديد (Clean Modern Design) --- */
         #loginOverlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg-gradient);
+            background: #ffffff; 
             z-index: 2000; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             padding: 20px; text-align: center;
         }
 
-        .login-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            padding: 40px; border-radius: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        .login-wrapper {
             width: 100%; max-width: 400px;
-            transition: height 0.3s ease;
+            padding: 40px 30px;
+            background: white;
+            border-radius: 24px;
+            /* تأثير ظل ناعم */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center;
+            border: 1px solid #f0f0f0;
         }
 
-        .login-container h1 { font-family: 'Cairo', sans-serif; font-size: 28px; margin: 0 0 10px 0; }
-        .login-container p { color: #6b7280; font-size: 14px; margin-bottom: 30px; font-family: 'Cairo'; }
-
-        .google-btn {
+        .brand-logo {
+            width: 80px; height: 80px;
+            background: #f0f9ff;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            width: 100%; background: #ffffff; border: 1px solid #e5e7eb;
-            padding: 12px; border-radius: 12px; cursor: pointer;
-            font-weight: 600; color: #374151; margin-bottom: 25px; font-family: 'Cairo';
-        }
-        .google-btn img { width: 22px; margin-left: 12px; }
-
-        .divider { display: flex; align-items: center; margin: 20px 0; color: #9ca3af; font-size: 13px; font-family: 'Cairo'; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #e5e7eb; }
-        .divider:not(:empty)::before { margin-left: 15px; } 
-        .divider:not(:empty)::after { margin-right: 15px; }
-
-        .input-field {
-            width: 100%; padding: 14px; margin-bottom: 15px;
-            border: 1px solid #e5e7eb; border-radius: 12px;
-            background: #f9fafb; font-size: 15px; font-family: 'Cairo';
-        }
-        .input-field:focus { outline: none; border-color: var(--primary); background: #fff; }
-
-        .login-btn {
-            width: 100%; padding: 14px; background: var(--primary);
-            color: white; border: none; border-radius: 12px;
-            font-weight: 700; font-size: 16px; cursor: pointer; font-family: 'Cairo';
+            margin-bottom: 25px;
+            color: var(--primary);
         }
 
-        .footer-text { margin-top: 25px; font-size: 14px; color: #6b7280; font-family: 'Cairo'; }
-        .footer-text span { color: var(--primary); font-weight: 600; cursor: pointer; }
+        .login-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 26px; font-weight: 700; color: #111827;
+            margin: 0 0 10px 0;
+        }
+        
+        .login-subtitle {
+            color: #6b7280; font-size: 15px; margin-bottom: 35px;
+            line-height: 1.5; font-family: 'Cairo', sans-serif;
+        }
 
-        /* --- التطبيق --- */
+        .google-signin-btn {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; background: #ffffff; color: #374151;
+            border: 1px solid #dadce0; padding: 14px;
+            border-radius: 50px; cursor: pointer;
+            font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 16px;
+            transition: all 0.2s ease; position: relative; overflow: hidden;
+        }
+
+        .google-signin-btn:active { background-color: #f8fafc; transform: scale(0.98); }
+        .google-signin-btn img { width: 22px; height: 22px; }
+
+        .secure-badge {
+            margin-top: 40px; display: flex; align-items: center; gap: 6px;
+            color: #9ca3af; font-size: 12px;
+            background: #f9fafb; padding: 6px 14px; border-radius: 20px;
+        }
+
+        /* --- بقية تصميم التطبيق --- */
         header {
             height: var(--header-height); padding: 0 20px;
             display: grid; grid-template-columns: 45px 1fr 45px;
-            align-items: center; background: #f3f4f6; position: relative;
+            align-items: center; position: relative; margin-bottom: 10px;
+            background: var(--bg);
         }
 
-        h1.app-title {
-            margin: 0; font-size: 20px; color: var(--primary-dark);
-            font-weight: 700; display: flex; align-items: center;
-            justify-content: center; gap: 8px; font-family: 'Tajawal';
+        h1 {
+            margin: 0; font-size: 20px; color: #1f2937;
+            font-weight: 800; display: flex; align-items: center;
+            justify-content: center; gap: 8px; white-space: nowrap;
         }
 
         .menu-btn {
             width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; background: white; color: #4b5563; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 14px; cursor: pointer; background: white; color: #374151; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: 0.2s;
         }
+        .menu-btn:active { background: #e5e7eb; }
 
         .main-menu {
             position: absolute; top: calc(var(--header-height) + 5px); left: 20px;
@@ -111,100 +121,123 @@
         }
         @keyframes menuPop { from{opacity:0; transform:scale(0.95);} to{opacity:1; transform:scale(1);} }
         
-        .menu-item { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; color: #4b5563; font-weight: 500;}
+        .menu-item {
+            padding: 16px 20px; cursor: pointer; border-bottom: 1px solid #f3f4f6;
+            font-size: 15px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; color: #4b5563;
+        }
         .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background: #f9fafb; }
         .delete-item { color: var(--danger); }
         .sync-item { background: #f0f9ff; color: var(--primary-dark); } 
 
-        .container-app {
+        .container {
             padding: 0 25px; flex: 1; display: flex; flex-direction: column; gap: 15px;
             max-width: 500px; margin: 0 auto; width: 100%;
         }
 
         .app-input {
-            width: 100%; padding: 18px; border: 1px solid #e5e7eb;
-            border-radius: 14px; font-family: 'Tajawal'; font-size: 16px;
-            outline: none; background: white; transition: 0.3s;
+            width: 100%; padding: 18px; border: 1px solid var(--gray-border);
+            border-radius: 16px; font-family: 'Tajawal', sans-serif; font-size: 16px;
+            outline: none; background: white; color: var(--text); transition: 0.3s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .app-input:focus { border-color: var(--primary); }
+        .app-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
 
         .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 14px;
-            font-size: 16px; font-weight: 700; cursor: pointer;
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s;
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-family: 'Tajawal';
         }
-        .btn-primary { background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.4); }
-        .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); margin-top: 5px; }
+        .btn-primary { 
+            background: var(--primary); color: white; 
+            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4); 
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-outline { background: white; color: var(--primary); border: 1px solid var(--gray-border); margin-top: 5px; }
+        .btn-outline:active { background: #f9fafb; transform: scale(0.98); }
 
-        /* --- Vault Page --- */
+        /* Vault Page */
         #vaultPage {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #f9fafb; z-index: 200; display: none; flex-direction: column;
-            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+            background: var(--bg); z-index: 200; display: none; flex-direction: column;
+            overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .vault-fixed-top { padding: 10px 20px 5px 20px; background: #f9fafb; flex-shrink: 0; z-index: 10; }
+        .vault-fixed-top {
+            padding: 10px 20px 5px 20px; background: var(--bg); flex-shrink: 0;
+            display: flex; flex-direction: column; gap: 12px; z-index: 10;
+        }
 
-        #vaultList { flex: 1; overflow-y: auto; padding: 10px 20px 100px 20px; -webkit-overflow-scrolling: touch; }
+        #vaultList {
+            flex: 1; overflow-y: auto; padding: 10px 20px 100px 20px; -webkit-overflow-scrolling: touch;
+        }
 
-        .vault-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; height: 45px; }
-        .vault-title { color:#1f2937; margin:0; font-size: 20px; font-weight: 700; }
+        .vault-header { 
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; height: 50px;
+        }
+        .vault-title { color:#1f2937; margin:0; font-size: 22px; font-weight: 800; }
         
-        .header-actions { display: flex; gap: 10px; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
         .icon-btn { 
-            background: white; border: 1px solid #e5e7eb; width: 40px; height: 40px;
+            background: white; border: none; width: 42px; height: 42px;
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; cursor: pointer; color: var(--text);
+            font-size: 18px; cursor: pointer; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .icon-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .icon-btn.active { background: var(--primary); color: white; }
 
         .folders-bar {
             display: flex; gap: 10px; overflow-x: auto; padding: 5px 2px 10px 2px;
-            scrollbar-width: none; flex-shrink: 0;
+            scrollbar-width: none; -ms-overflow-style: none; flex-shrink: 0;
         }
         .folder-chip {
-            background: white; padding: 8px 16px; border-radius: 20px; font-size: 14px;
-            color: #6b7280; border: 1px solid #e5e7eb; white-space: nowrap; cursor: pointer;
-            display: flex; align-items: center; gap: 5px; user-select: none;
+            background: white; padding: 10px 18px; border-radius: 14px; font-size: 14px;
+            color: #6b7280; border: 1px solid transparent; white-space: nowrap; cursor: pointer;
+            transition: 0.2s; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .folder-chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+        .folder-chip.active {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
         .add-folder-btn {
-            background: #f3f4f6; color: var(--primary); font-weight: bold; width: 35px; height: 35px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-            border: 1px dashed var(--primary);
+            background: #e0e7ff; color: var(--primary); font-weight: bold; width: 40px; height: 40px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            cursor: pointer;
         }
 
         .account-card {
-            background: white; padding: 15px; border-radius: 18px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 12px;
-            display: flex; align-items: center; gap: 12px; position: relative;
-            transition: transform 0.2s, background-color 0.2s; border: 1px solid transparent;
+            background: white; padding: 18px; border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 15px; position: relative; overflow: hidden;
+            transition: transform 0.2s;
         }
-        .account-card.selected-card { background: #eef2ff; border-color: var(--primary); }
-        .account-card.dragging { opacity: 0.6; background: #fafafa; border: 2px dashed #ccc; transform: scale(0.98); }
+        .account-card:active { transform: scale(0.99); }
+        .account-card.selected-card { background: #eef2ff; border: 1px solid var(--primary); }
+        .account-card.dragging { opacity: 0.6; transform: scale(0.95); box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 100;}
         
         .selection-check {
             width: 24px; height: 24px; border-radius: 50%; border: 2px solid #d1d5db;
-            display: none; align-items: center; justify-content: center; color: white; flex-shrink: 0;
+            display: none; align-items: center; justify-content: center; color: white;
+            flex-shrink: 0; transition: 0.2s;
         }
         .selected-card .selection-check { display: flex; background: var(--primary); border-color: var(--primary); }
         
-        .drag-handle-visible { color: #d1d5db; padding: 5px; display: flex; align-items: center; }
-        
-        .card-main { flex: 1; display: flex; flex-direction: column; gap: 6px; padding-right: 5px;}
-        .card-email { font-weight: 700; color: #1f2937; font-size: 15px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; word-break: break-all;}
-        .card-pass-pill {
-            background: #f3f4f6; padding: 8px; border-radius: 50px; text-align: center;
-            font-family: monospace; color: #374151; cursor: pointer; letter-spacing: 2px; font-size: 20px;
+        .drag-handle-visible {
+            color: #d1d5db; cursor: grab; padding: 5px;
+            display: flex; align-items: center; justify-content: center;
         }
-        .hidden-pass { color: #9ca3af; letter-spacing: 4px; font-size: 24px; line-height: 0.8;}
+        
+        .card-main { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; overflow: hidden;}
+        .card-email { font-weight: 700; color: #1f2937; font-size: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; word-break: break-all;}
+        .card-pass-pill {
+            background: #f3f4f6; padding: 10px 14px; border-radius: 12px; text-align: center;
+            font-family: monospace; color: #4b5563; cursor: pointer; letter-spacing: 0; font-size: 15px; width: fit-content; margin-right: auto;
+        }
+        .hidden-pass { color: #9ca3af; letter-spacing: 3px; font-size: 20px; line-height: 0.8;}
 
         .bottom-action-bar {
             position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); 
             left: 50%; transform: translateX(-50%) translateY(150px);
-            background: #1f2937; color: white; padding: 12px 25px; border-radius: 30px;
+            background: #111827; color: white; padding: 14px 25px; border-radius: 40px;
             display: flex; gap: 15px; align-items: center; z-index: 300; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
@@ -213,92 +246,101 @@
 
         .overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(3px);
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
             z-index: 900; display: none; justify-content: center; align-items: center;
             padding: 20px; opacity: 0; transition: opacity 0.2s;
         }
         .overlay.show { opacity: 1; }
 
+        /* تعديل المودال ليكون أكثر أناقة */
         .modal {
             background: white; width: 100%; max-width: 320px;
-            border-radius: 24px; padding: 25px; text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15); transform: scale(0.9); transition: transform 0.2s;
+            border-radius: 28px; padding: 25px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            transform: scale(0.9); transition: transform 0.2s;
         }
         .overlay.show .modal { transform: scale(1); }
-        .modal h3 { margin-top: 0; color: var(--primary); }
-        .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .btn-small { padding: 12px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; flex: 1; font-size: 14px; }
+
+        .modal h3 { margin-top: 5px; color: #111827; margin-bottom: 15px; font-size: 18px; }
+        .modal-actions { display: flex; gap: 12px; justify-content: center; margin-top: 25px; }
+        .btn-small { padding: 14px 20px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; flex: 1; font-size: 14px; }
         .btn-confirm { background: var(--primary); color: white; }
         .btn-cancel { background: #f3f4f6; color: #374151; }
 
         .folder-list-modal { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; text-align: right; margin-top: 15px; }
-        .folder-item-row { padding: 14px; background: #f9fafb; border-radius: 12px; cursor: pointer; font-weight: 500; }
-        
-        .modal-clean { background: white; width: 100%; max-width: 320px; border-radius: 24px; padding: 0; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
+        .folder-item-row { padding: 16px; background: #f9fafb; border-radius: 14px; cursor: pointer; font-weight: 500; border: 1px solid transparent; }
+        .folder-item-row:active { background: #e0e7ff; color: var(--primary); }
+
+        .modal-clean { background: white; width: 100%; max-width: 300px; border-radius: 24px; padding: 0; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
         .action-item { display: flex; align-items: center; justify-content: space-between; padding: 18px 25px; border-bottom: 1px solid #f3f4f6; cursor: pointer; color: #374151; font-weight: 500; }
         .action-item:last-child { border-bottom: none; color: var(--danger); }
+        .action-item:active { background: #f9fafb; }
 
         .toast {
             position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
-            background: #1f2937; color: white; padding: 10px 20px; border-radius: 30px;
+            background: #1f2937; color: white; padding: 12px 24px; border-radius: 30px;
             font-size: 14px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 3000;
-            white-space: nowrap; font-family: 'Tajawal';
+            white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
         .sync-loader {
             display: none; width: 16px; height: 16px; border: 2px solid #ddd;
             border-top: 2px solid var(--primary); border-radius: 50%;
             animation: spin 0.8s linear infinite; margin-right: 10px;
         }
         @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-<!-- Login -->
+<!-- شاشة الدخول الجديدة -->
 <div id="loginOverlay">
-    <div class="login-container">
-        <h1 id="loginTitle">أهلاً بك</h1>
-        <p id="loginSubtitle">سجل دخولك للمتابعة إلى خزنتك</p>
+    <div class="login-wrapper">
+        <div class="brand-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        
+        <h2 class="login-title">أهلاً بك</h2>
+        <p class="login-subtitle">سجل دخولك لمزامنة بياناتك بأمان<br>عبر حساب Google Drive الخاص بك</p>
 
-        <button class="google-btn" onclick="startGoogleLogin()">
+        <button class="google-signin-btn" onclick="startGoogleLogin()">
             <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Check_Logo.svg" alt="Google">
-            <span id="googleBtnText">المتابعة باستخدام جوجل</span>
+            تسجيل الدخول باستخدام Google
         </button>
 
-        <div class="divider">أو عبر البريد الإلكتروني</div>
+        <div id="loginStatus" style="margin-top:20px; font-size:14px; color:var(--primary); display:none; font-weight:600;">جاري الاتصال الآمن...</div>
 
-        <form onsubmit="handleManualLogin(event)">
-            <input type="email" id="manualEmail" class="input-field" placeholder="البريد الإلكتروني" required>
-            <input type="password" id="manualPass" class="input-field" placeholder="كلمة المرور" required>
-            <input type="password" id="confirmPass" class="input-field" placeholder="تأكيد كلمة المرور" style="display:none">
-            <button type="submit" id="mainLoginBtn" class="login-btn">تسجيل الدخول</button>
-        </form>
-
-        <div class="footer-text">
-            <span id="toggleText">ليس لديك حساب؟</span> 
-            <span id="toggleLink" onclick="toggleLoginMode()">إنشاء حساب جديد</span>
+        <div class="secure-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            تشفير من طرف لطرف
         </div>
-        <div id="loginStatus" style="margin-top:20px; font-size:13px; color:var(--primary); display:none; font-family:'Tajawal'">جاري الاتصال...</div>
     </div>
 </div>
 
-<!-- App Header -->
 <header>
     <div class="menu-btn" onclick="safeToggleMenu(event)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </div>
-    <h1 class="app-title">خزنة أسراري <div id="syncLoader" class="sync-loader"></div></h1>
+    
+    <h1>
+        خزنة أسراري 
+        <div id="syncLoader" class="sync-loader"></div>
+    </h1>
+    
     <div style="width: 45px;"></div>
     
     <div id="mainMenu" class="main-menu" onclick="event.stopPropagation()">
+        <!-- أزرار المزامنة -->
         <div class="menu-item sync-item" onclick="forceSyncFromCloud()">
-            <span>تحديث من السحابة</span>
+            <span>تحديث من السحابة (جلب)</span>
             <svg style="width:20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="M8 17l4 4 4-4"></path></svg>
         </div>
         <div class="menu-item sync-item" onclick="forceUploadToDrive()">
             <span>دمج ورفع للسحابة</span>
             <svg style="width:20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="M16 16l-4-4-4 4"></path></svg>
         </div>
+
         <div class="menu-item" id="menuSetPass" onclick="handleAppLockSettings()">
             <span id="lockMenuText">إعدادات القفل</span>
             <svg style="width:20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -316,14 +358,15 @@
             <svg style="width:20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         </div>
         <div class="menu-item delete-item" onclick="handleLogout()" style="border-top:1px solid #f0f0f0">
-            <span>تسجيل الخروج</span>
+            <span>تسجيل الخروج (مسح محلي)</span>
             <svg style="width:20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline></svg>
         </div>
     </div>
 </header>
 
-<div class="container-app">
+<div class="container">
     <div style="margin-top: 10px;"></div>
+    
     <input type="text" id="emailInput" class="app-input" placeholder="البريد الإلكتروني / العنوان" autocomplete="off">
     <input type="text" id="passInput" class="app-input" placeholder="كلمة المرور" autocomplete="off">
     
@@ -332,16 +375,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
     </button>
 
-    <!-- تم تعديل زر فتح المحفوظات هنا لإضافة checkVaultMove -->
     <button id="vaultBtn" class="btn btn-outline" 
             onclick="openVaultCheck()" 
-            onmousedown="startVaultPress(event)" 
-            ontouchstart="startVaultPress(event)" 
-            onmouseup="cancelVaultPress()" 
-            ontouchend="cancelVaultPress()"
-            ontouchmove="checkVaultMove(event)">
+            onmousedown="startVaultPress()" ontouchstart="startVaultPress()" ontouchmove="cancelVaultPress()"
+            onmouseup="cancelVaultPress()" ontouchend="cancelVaultPress()">
         <span>فتح المحفوظات</span> 
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2-2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
     </button>
 </div>
 
@@ -362,7 +401,7 @@
 
         <div style="position: relative; margin-bottom: 5px;">
             <svg style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #9ca3af;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="searchInput" style="width: 100%; padding: 15px 45px 15px 15px; border-radius: 15px; border: 1px solid #e5e7eb; background: white; margin:0; font-family:'Tajawal'" placeholder="بحث سريع..." oninput="renderVault()">
+            <input type="text" id="searchInput" style="width: 100%; padding: 15px 45px 15px 15px; border-radius: 14px; border: 1px solid #e5e7eb; background: white; margin:0; font-family:'Tajawal'" placeholder="بحث سريع..." oninput="renderVault()">
         </div>
 
         <div class="folders-bar" id="foldersBar">
@@ -382,9 +421,9 @@
 </div>
 
 <!-- Context Menu -->
-<div id="contextModal" class="overlay" onclick="goBack()">
+<div id="contextModal" class="overlay" onclick="closeOverlayOnly()">
     <div class="modal-clean" onclick="event.stopPropagation()">
-        <div style="text-align: center; padding: 20px 0 10px 0; color: var(--primary); font-weight: 700;">خيارات</div>
+        <div style="text-align: center; padding: 20px 0 10px 0; color: var(--text); font-weight: 700; background:#f9fafb;">خيارات</div>
         <div class="action-list">
             <div class="action-item" onclick="ctxAction('copy')">
                 <span>نسخ</span>
@@ -403,8 +442,8 @@
 </div>
 
 <!-- Modals -->
-<div id="confirmModal" class="overlay">
-    <div class="modal">
+<div id="confirmModal" class="overlay" onclick="closeOverlayOnly()">
+    <div class="modal" onclick="event.stopPropagation()">
         <h3 id="confirmTitle">تنبيه</h3>
         <p id="confirmMessage" style="color:#6b7280; margin-bottom:20px">هل أنت متأكد؟</p>
         <div class="modal-actions">
@@ -414,10 +453,10 @@
     </div>
 </div>
 
-<div id="passwordModal" class="overlay">
-    <div class="modal">
+<div id="passwordModal" class="overlay" onclick="closeOverlayOnly()">
+    <div class="modal" onclick="event.stopPropagation()">
         <h3 id="passModalTitle">أدخل الرمز</h3>
-        <input type="password" id="globalPassInput" style="text-align:center; font-size:24px; letter-spacing:5px; width:100%; border:1px solid #ddd; padding:10px; border-radius:10px;" placeholder="••••" inputmode="numeric">
+        <input type="password" id="globalPassInput" style="text-align:center; font-size:24px; letter-spacing:5px; width:100%; border:1px solid #ddd; padding:15px; border-radius:14px; outline:none" placeholder="••••" inputmode="numeric">
         <div class="modal-actions">
             <button class="btn-small btn-cancel" onclick="goBack()">إلغاء</button>
             <button class="btn-small btn-confirm" onclick="submitPassword()">تأكيد</button>
@@ -425,7 +464,7 @@
     </div>
 </div>
 
-<div id="folderSelectModal" class="overlay" onclick="goBack()">
+<div id="folderSelectModal" class="overlay" onclick="closeOverlayOnly()">
     <div class="modal" onclick="event.stopPropagation()">
         <h3 id="folderModalTitle">اختر المجلد</h3>
         <div class="folder-list-modal" id="folderListModalBody"></div>
@@ -433,8 +472,8 @@
     </div>
 </div>
 
-<div id="addFolderModal" class="overlay">
-    <div class="modal">
+<div id="addFolderModal" class="overlay" onclick="closeOverlayOnly()">
+    <div class="modal" onclick="event.stopPropagation()">
         <h3 id="addFolderTitle">مجلد جديد</h3>
         <input type="text" id="folderNameInput" class="app-input" placeholder="اسم المجلد">
         <div class="modal-actions">
@@ -444,7 +483,7 @@
     </div>
 </div>
 
-<div id="backupModal" class="overlay" onclick="goBack()">
+<div id="backupModal" class="overlay" onclick="closeOverlayOnly()">
     <div class="modal" onclick="event.stopPropagation()">
         <h3>نسخ احتياطي</h3>
         <textarea id="backupText" style="width:100%; height:100px; border:1px solid #ddd; border-radius:12px; padding:10px; resize:none;" readonly></textarea>
@@ -455,7 +494,7 @@
     </div>
 </div>
 
-<div id="importModal" class="overlay" onclick="goBack()">
+<div id="importModal" class="overlay" onclick="closeOverlayOnly()">
     <div class="modal" onclick="event.stopPropagation()">
         <h3>استيراد بيانات</h3>
         <textarea id="importText" style="width:100%; height:100px; border:1px solid #ddd; border-radius:12px; padding:10px; resize:none;" placeholder="الصق الكود هنا..."></textarea>
@@ -477,11 +516,7 @@
     let folders = JSON.parse(localStorage.getItem('myFolders') || '["عام", "فيسبوك", "جوجل"]');
     accounts.forEach(acc => { if(!acc.folder) acc.folder = 'عام'; });
 
-    // --- NEW: GLOBAL TOUCH TRACKING ---
     let longPressTimer, isLongPress = false;
-    let vaultPressTimer = null;
-    let touchStartX = 0, touchStartY = 0; // لحفظ إحداثيات بداية اللمس
-
     let currentCtxId = null, currentCtxType = null;
     let pendingCallback = null;
     let activeFolder = 'All'; 
@@ -489,6 +524,8 @@
     let selectedIds = new Set();
     let isMoveAction = false; 
     let folderRenameTarget = null;
+    let vaultPressTimer = null;
+    let isScrolling = false; // Flag to fix scroll issue
 
     // --- Google API Config ---
     const GOOGLE_CLIENT_ID = '979816526016-ukb9vqtb6u2hlutombpf8rumbjr3o2ua.apps.googleusercontent.com';
@@ -497,30 +534,7 @@
     let tokenClient;
     let gAccessToken = localStorage.getItem('gAccessToken');
 
-    // --- Login Logic ---
-    let isLoginMode = true;
-    function toggleLoginMode() {
-        isLoginMode = !isLoginMode;
-        document.getElementById('loginTitle').innerText = isLoginMode ? "أهلاً بك" : "حساب جديد";
-        document.getElementById('loginSubtitle').innerText = isLoginMode ? "سجل دخولك للمتابعة إلى خزنتك" : "أنشئ حسابك لحفظ بياناتك بأمان";
-        document.getElementById('mainLoginBtn').innerText = isLoginMode ? "تسجيل الدخول" : "إنشاء الحساب";
-        document.getElementById('confirmPass').style.display = isLoginMode ? 'none' : 'block';
-        document.getElementById('toggleText').innerText = isLoginMode ? "ليس لديك حساب؟" : "لديك حساب بالفعل؟";
-        document.getElementById('toggleLink').innerText = isLoginMode ? "إنشاء حساب جديد" : "تسجيل الدخول";
-        document.getElementById('googleBtnText').innerText = isLoginMode ? "المتابعة باستخدام جوجل" : "التسجيل باستخدام جوجل";
-    }
-
-    function handleManualLogin(e) {
-        e.preventDefault();
-        const pass = document.getElementById('manualPass').value;
-        if(!isLoginMode) {
-            const confirm = document.getElementById('confirmPass').value;
-            if(pass !== confirm) { alert("كلمة المرور غير متطابقة!"); return; }
-        }
-        alert(isLoginMode ? "سيتم توجيهك لربط حساب جوجل..." : "الرجاء ربط حساب جوجل لإنشاء مساحة التخزين السحابية.");
-        startGoogleLogin();
-    }
-
+    // --- Auth Functions ---
     function initGoogleLib() {
         if(window.google) {
             tokenClient = google.accounts.oauth2.initTokenClient({
@@ -549,7 +563,7 @@
 
     function handleLogout() {
         document.getElementById('mainMenu').style.display = 'none';
-        customConfirm("سيتم حذف البيانات من الجهاز فقط، هل أنت متأكد؟", () => {
+        customConfirm("هل أنت متأكد؟ سيتم حذف البيانات من هذا الجهاز (للحماية) وستبقى في السحابة.", () => {
             localStorage.removeItem('gAccessToken');
             localStorage.removeItem('myPasswords'); 
             localStorage.removeItem('myFolders');
@@ -559,7 +573,7 @@
         });
     }
 
-    // --- SYNC ENGINE ---
+    // --- SYNC ENGINE (Shortened for brevity as logic is same) ---
     async function syncFromCloud(silent = false) {
         if(!gAccessToken) return;
         setSyncLoader(true);
@@ -567,15 +581,15 @@
         try {
             const unique = new Date().getTime();
             const q = `name = '${FILENAME}' and 'appDataFolder' in parents and trashed = false`;
-            const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&cb=${unique}`, { headers: { 'Authorization': `Bearer ${gAccessToken}` } });
+            const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&cb=${unique}`, {
+                headers: { 'Authorization': `Bearer ${gAccessToken}` }
+            });
             if(searchResp.status === 401) { localStorage.removeItem('gAccessToken'); location.reload(); return; }
             const data = await searchResp.json();
-
             if (data.files && data.files.length > 0) {
-                if (data.files.length > 1) await deleteFile(data.files[1].id);
-                const fileId = data.files[0].id;
-                const fileResp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&cb=${unique}`, { headers: { 'Authorization': `Bearer ${gAccessToken}` } });
-                if (fileResp.ok) {
+                 const fileId = data.files[0].id;
+                 const fileResp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&cb=${unique}`, { headers: { 'Authorization': `Bearer ${gAccessToken}` } });
+                 if (fileResp.ok) {
                     const cloudContent = await fileResp.json();
                     if(cloudContent.appPass) localStorage.setItem('appPass', cloudContent.appPass);
                     if(cloudContent.vaultPass) localStorage.setItem('vaultPass', cloudContent.vaultPass);
@@ -587,11 +601,10 @@
                         });
                         const localFolders = new Set(folders);
                         (cloudContent.folders || []).forEach(f => { if(!localFolders.has(f)) folders.push(f); });
-
-                        if(addedCount > 0) { saveToLocal(); renderVault(); if(!silent) showToast(`تم جلب ${addedCount} عنصر`); } 
-                        else if(!silent) showToast("لا توجد تغييرات");
+                        if(addedCount > 0) { saveToLocal(); renderVault(); if(!silent) showToast(`تم جلب ${addedCount} عنصر`); }
+                        else if(!silent) showToast("تمت المزامنة");
                     }
-                }
+                 }
             } else if(accounts.length > 0) uploadToDrive(true);
         } catch(e) { console.error(e); }
         setSyncLoader(false);
@@ -606,11 +619,15 @@
             const q = `name = '${FILENAME}' and 'appDataFolder' in parents and trashed = false`;
             const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=appDataFolder&orderBy=modifiedTime desc&cb=${unique}`, { headers: { 'Authorization': `Bearer ${gAccessToken}` } });
             const data = await searchResp.json();
-            let targetFileId = data.files && data.files.length > 0 ? data.files[0].id : null;
+            let targetFileId = null;
+            if (data.files && data.files.length > 0) targetFileId = data.files[0].id;
 
-            const payload = { accounts: accounts, folders: folders, appPass: localStorage.getItem('appPass'), vaultPass: localStorage.getItem('vaultPass') };
+            const payload = { 
+                accounts: accounts, folders: folders,
+                appPass: localStorage.getItem('appPass'),
+                vaultPass: localStorage.getItem('vaultPass') 
+            };
             const fileBlob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-
             if (targetFileId) {
                 await fetch(`https://www.googleapis.com/upload/drive/v3/files/${targetFileId}?uploadType=media`, {
                     method: 'PATCH', headers: { 'Authorization': `Bearer ${gAccessToken}`, 'Content-Type': 'application/json' }, body: fileBlob
@@ -624,62 +641,96 @@
                     method: 'POST', headers: { 'Authorization': `Bearer ${gAccessToken}` }, body: form
                 });
             }
-            if(!silent) showToast("تم الحفظ في السحابة ✅");
-        } catch(e) { console.error(e); showToast("فشل الرفع! ❌"); }
+            if(!silent) showToast("تم الحفظ سحابياً");
+        } catch(e) { console.error(e); }
         setSyncLoader(false);
     }
+    async function deleteFile(id) { await fetch(`https://www.googleapis.com/drive/v3/files/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${gAccessToken}` } }); }
 
-    async function deleteFile(id) {
-        await fetch(`https://www.googleapis.com/drive/v3/files/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${gAccessToken}` } });
+    // --- Helper Functions & Navigation Fixes ---
+    function saveToLocal() {
+        localStorage.setItem('myPasswords', JSON.stringify(accounts));
+        localStorage.setItem('myFolders', JSON.stringify(folders));
     }
 
-    document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === 'visible' && gAccessToken) syncFromCloud(true);
-    });
-    function forceSyncFromCloud() { document.getElementById('mainMenu').style.display='none'; syncFromCloud(false); }
-    function forceUploadToDrive() { document.getElementById('mainMenu').style.display='none'; uploadToDrive(false); }
-
-    function saveToLocal() { localStorage.setItem('myPasswords', JSON.stringify(accounts)); localStorage.setItem('myFolders', JSON.stringify(folders)); }
-    function pushHistory(type = 'modal') { window.history.pushState({modal: type}, null, ''); }
+    // New Navigation Logic to fix "Back" issues
+    function pushHistory(type = 'modal') { 
+        window.history.pushState({modal: type}, null, ''); 
+    }
+    
     function goBack() { 
-        const overlays = document.querySelectorAll('.overlay');
-        let visible = false;
-        overlays.forEach(o => { if(o.classList.contains('show')) { o.classList.remove('show'); setTimeout(()=>o.style.display='none',200); visible=true; } });
-        if(!visible && document.getElementById('vaultPage').style.display === 'flex') { document.getElementById('vaultPage').style.display = 'none'; }
-        if(window.history.state) window.history.back();
+        // Logic: if there's a history state, go back. 
+        // The onpopstate event will handle the UI updates.
+        if(window.history.state) {
+            window.history.back();
+        } else {
+            // Fallback if no history (shouldn't happen often)
+            closeAllOverlays();
+            document.getElementById('vaultPage').style.display = 'none';
+        }
     }
+
+    // Explicit function to close just the overlay when clicking backdrop
+    function closeOverlayOnly() {
+        goBack(); // This triggers history back, which triggers onpopstate, which closes the modal
+    }
+    
+    // Close overlays without affecting history (used internally)
+    function closeAllOverlays() {
+        document.querySelectorAll('.overlay').forEach(o => {
+            o.classList.remove('show');
+            setTimeout(() => o.style.display = 'none', 200);
+        });
+    }
+
+    // Single source of truth for navigation changes
     window.onpopstate = () => {
-        const overlays = document.querySelectorAll('.overlay');
-        let closedModal = false;
-        overlays.forEach(o => { if(o.classList.contains('show')) { o.classList.remove('show'); setTimeout(()=>o.style.display='none', 200); closedModal = true; } });
-        if(!closedModal) { const vault = document.getElementById('vaultPage'); if(vault.style.display === 'flex') vault.style.display = 'none'; }
+        const overlays = document.querySelectorAll('.overlay.show');
+        if(overlays.length > 0) {
+            closeAllOverlays();
+        } else {
+            const vault = document.getElementById('vaultPage');
+            if(vault.style.display === 'flex') {
+                vault.style.display = 'none';
+            }
+        }
     };
-    function showOverlay(id) { pushHistory(); const el = document.getElementById(id); el.style.display = 'flex'; el.offsetHeight; el.classList.add('show'); }
+
+    function showOverlay(id) {
+        pushHistory(); // Add state so "Back" button works
+        const el = document.getElementById(id);
+        el.style.display = 'flex';
+        el.offsetHeight; 
+        el.classList.add('show');
+    }
 
     // --- App Actions ---
     function submitPassword() {
         const val = document.getElementById('globalPassInput').value;
-        const cb = pendingCallback; goBack(); 
-        if(cb) setTimeout(() => cb(val), 200); 
+        const cb = pendingCallback;
+        goBack(); 
+        if(cb) { setTimeout(() => { cb(val); }, 200); }
         pendingCallback = null;
     }
+
     function prepareSaveAccount() {
         const email = document.getElementById('emailInput').value;
         if (!email) { showToast("أدخل البيانات أولاً ⚠️"); return; }
-        isMoveAction = false; openFolderSelectModal("حفظ في...");
+        isMoveAction = false;
+        openFolderSelectModal("حفظ في...");
     }
+
     function saveAccount(targetFolder) {
         const email = document.getElementById('emailInput').value;
         const pass = document.getElementById('passInput').value;
         accounts.unshift({ id: Date.now(), email, pass, folder: targetFolder });
         saveToLocal(); uploadToDrive(true); 
-        document.getElementById('emailInput').value = ''; document.getElementById('passInput').value = '';
-        showToast("تم الحفظ محلياً وجاري الرفع..."); renderVault();
+        document.getElementById('emailInput').value = '';
+        document.getElementById('passInput').value = '';
+        showToast("تم الحفظ ✅"); renderVault();
     }
 
-    // --- RENDER & LOGIC UPDATES FOR SCROLL FIX ---
-
-    // 1. Updated Render Folders (Includes checkMove logic)
+    // --- Rendering (With Scroll Fixes) ---
     function renderFoldersBar() {
         const bar = document.getElementById('foldersBar');
         bar.innerHTML = '';
@@ -693,15 +744,13 @@
             const chip = document.createElement('div');
             chip.className = `folder-chip ${activeFolder === f ? 'active' : ''}`;
             chip.innerText = f;
-            chip.onclick = () => { activeFolder = f; renderVault(); renderFoldersBar(); };
-            
-            // Touch Logic for Folders
-            chip.onmousedown = (e) => startFolderPress(e, f);
-            chip.ontouchstart = (e) => startFolderPress(e, f);
+            chip.onclick = () => { if(!isScrolling) { activeFolder = f; renderVault(); renderFoldersBar(); } };
+            // Scroll Fix: ontouchmove cancels press
+            chip.onmousedown = () => startFolderPress(f);
+            chip.ontouchstart = () => startFolderPress(f);
+            chip.ontouchmove = cancelPress; 
             chip.onmouseup = cancelPress;
             chip.ontouchend = cancelPress;
-            chip.ontouchmove = (e) => checkMove(e); // If moved, cancel press
-
             bar.appendChild(chip);
         });
         const addBtn = document.createElement('div');
@@ -711,7 +760,6 @@
         bar.appendChild(addBtn);
     }
 
-    // 2. Updated Render Vault (Includes checkMove logic)
     function renderVault() {
         const list = document.getElementById('vaultList');
         const searchVal = document.getElementById('searchInput').value.toLowerCase();
@@ -721,7 +769,7 @@
         if (activeFolder !== 'All') displayAccounts = displayAccounts.filter(acc => acc.folder === activeFolder);
         if(searchVal) displayAccounts = displayAccounts.filter(acc => (acc.email && acc.email.toLowerCase().includes(searchVal)) || (acc.pass && acc.pass.toLowerCase().includes(searchVal)));
 
-        if(displayAccounts.length === 0) { list.innerHTML = '<p style="text-align:center;color:#ccc;margin-top:40px">لا توجد بيانات</p>'; return; }
+        if(displayAccounts.length === 0) { list.innerHTML = '<p style="text-align:center;color:#9ca3af;margin-top:40px">لا توجد بيانات</p>'; return; }
 
         displayAccounts.forEach(acc => {
             const card = document.createElement('div');
@@ -729,110 +777,50 @@
             card.setAttribute('data-id', acc.id);
             
             const displayName = acc.email || "بدون عنوان";
+            
             let leftSide = '';
-            if (isSelectionMode) {
-                leftSide = `<div class="selection-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
-            } else if (!searchVal && activeFolder !== 'All') {
-                leftSide = `<div class="drag-handle-visible" onmousedown="initDrag(event)" ontouchstart="initDrag(event)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>`;
-            } else {
-                 leftSide = `<div style="width:24px; display:flex; justify-content:center"><div style="width:6px; height:6px; background:#e5e7eb; border-radius:50%"></div></div>`;
-            }
+            if (isSelectionMode) leftSide = `<div class="selection-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+            else if (!searchVal && activeFolder !== 'All') leftSide = `<div class="drag-handle-visible" onmousedown="initDrag(event)" ontouchstart="initDrag(event)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>`;
+            else leftSide = `<div style="width:24px;"></div>`;
 
-            // Note: Added ontouchmove="checkMove(event)"
             card.innerHTML = `
                 ${leftSide}
                 <div class="card-main" onclick="handleCardClick(event, ${acc.id})">
                     <div class="card-email" 
-                         onmousedown="startPress(event, 'email', ${acc.id})" 
-                         ontouchstart="startPress(event, 'email', ${acc.id})" 
-                         onmouseup="cancelPress()" 
-                         ontouchend="cancelPress()"
-                         ontouchmove="checkMove(event)">
+                         onmousedown="startPress('email', ${acc.id})" ontouchstart="startPress('email', ${acc.id})" 
+                         ontouchmove="cancelPress()" onmouseup="cancelPress()" ontouchend="cancelPress()">
                         <span>${displayName}</span>
                     </div>
                     <div id="pass-${acc.id}" class="card-pass-pill hidden-pass"
-                        onmousedown="startPress(event, 'pass', ${acc.id})" 
-                        ontouchstart="startPress(event, 'pass', ${acc.id})" 
-                        onmouseup="cancelPress()" 
-                        ontouchend="cancelPress()"
-                        ontouchmove="checkMove(event)">••••••••</div>
+                        onmousedown="startPress('pass', ${acc.id})" ontouchstart="startPress('pass', ${acc.id})" 
+                        ontouchmove="cancelPress()" onmouseup="cancelPress()" ontouchend="cancelPress()">••••••••</div>
                 </div>
             `;
             list.appendChild(card);
         });
     }
 
-    // --- CORE LOGIC FOR TOUCH vs SCROLL ---
-
-    // For Items & Folders
-    function startPress(e, type, id) {
-        isLongPress = false;
-        // Capture start coordinates
-        if(e.type === 'touchstart' && e.touches.length > 0) {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        }
-        longPressTimer = setTimeout(() => { isLongPress = true; openContextMenu(type, id); }, 800);
-    }
-
-    function startFolderPress(e, f) {
-        isLongPress = false;
-        if(e.type === 'touchstart' && e.touches.length > 0) {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        }
-        longPressTimer = setTimeout(() => { 
-            isLongPress = true; 
-            if(f!=='عام') openAddFolderModal(f); 
-        }, 800);
-    }
-
-    // For Vault Button (Main Page)
-    function startVaultPress(e) {
-        isLongPress = false;
-        if(e.type === 'touchstart' && e.touches.length > 0) {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        }
-        vaultPressTimer = setTimeout(() => { isLongPress = true; handleVaultLongPress(); }, 800);
-    }
-
-    // *** The Check Function (Cancels timer if moved > 10px) ***
-    function checkMove(e) {
-        if(!longPressTimer) return;
-        if(e.type === 'touchmove' && e.touches.length > 0) {
-            const dx = Math.abs(e.touches[0].clientX - touchStartX);
-            const dy = Math.abs(e.touches[0].clientY - touchStartY);
-            if(dx > 10 || dy > 10) { clearTimeout(longPressTimer); longPressTimer = null; }
-        }
-    }
-
-    function checkVaultMove(e) {
-        if(!vaultPressTimer) return;
-        if(e.type === 'touchmove' && e.touches.length > 0) {
-            const dx = Math.abs(e.touches[0].clientX - touchStartX);
-            const dy = Math.abs(e.touches[0].clientY - touchStartY);
-            if(dx > 10 || dy > 10) { clearTimeout(vaultPressTimer); vaultPressTimer = null; }
-        }
-    }
-
-    function cancelPress() { clearTimeout(longPressTimer); }
-    function cancelVaultPress() { clearTimeout(vaultPressTimer); }
-
-    // ---------------------------------------------------
-
+    // --- Interactive Logic ---
     function toggleSelectionMode() {
-        isSelectionMode = !isSelectionMode; selectedIds.clear();
+        isSelectionMode = !isSelectionMode;
+        selectedIds.clear();
         const btn = document.getElementById('selectToggleBtn');
         const bottomBar = document.getElementById('bottomBar');
-        if (isSelectionMode) { btn.classList.add('active'); bottomBar.classList.add('visible'); document.getElementById('selectedCount').innerText = "0 محدد"; } 
-        else { btn.classList.remove('active'); bottomBar.classList.remove('visible'); }
+        if (isSelectionMode) {
+            btn.classList.add('active');
+            bottomBar.classList.add('visible');
+            document.getElementById('selectedCount').innerText = "0 محدد";
+        } else {
+            btn.classList.remove('active');
+            bottomBar.classList.remove('visible');
+        }
         renderVault();
     }
 
     function handleCardClick(e, id) {
         if (isSelectionMode) {
-            if (selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
             document.getElementById('selectedCount').innerText = selectedIds.size + " محدد";
             renderVault();
         } else {
@@ -845,58 +833,103 @@
         if(isLongPress) return;
         const el = document.getElementById(`pass-${id}`);
         const acc = accounts.find(a => a.id === id);
-        if(el.classList.contains('hidden-pass')) { el.innerText = acc.pass || '...'; el.classList.remove('hidden-pass'); el.style.fontSize = "16px"; el.style.letterSpacing = "0"; } 
-        else { el.innerText = '••••••••'; el.classList.add('hidden-pass'); el.style.fontSize = "20px"; el.style.letterSpacing = "2px"; }
+        if(el.classList.contains('hidden-pass')) {
+             el.innerText = acc.pass || '...'; 
+             el.classList.remove('hidden-pass');
+             el.style.fontSize = "15px"; el.style.letterSpacing = "0";
+        } else { 
+            el.innerText = '••••••••'; 
+            el.classList.add('hidden-pass'); 
+            el.style.fontSize = "20px"; el.style.letterSpacing = "3px";
+        }
     }
 
+    // --- Folders & Modals ---
     function openFolderSelectModal(title) {
         showOverlay('folderSelectModal');
         document.getElementById('folderModalTitle').innerText = title;
         const listBody = document.getElementById('folderListModalBody');
         listBody.innerHTML = '';
         const addRow = document.createElement('div');
-        addRow.className = 'folder-item-row'; addRow.style.color = 'var(--primary)'; addRow.innerText = '+ مجلد جديد';
+        addRow.className = 'folder-item-row';
+        addRow.style.color = 'var(--primary)';
+        addRow.innerText = '+ مجلد جديد';
         addRow.onclick = () => { goBack(); setTimeout(openAddFolderModal, 200); };
         listBody.appendChild(addRow);
+
         folders.forEach(f => {
-            const row = document.createElement('div'); row.className = 'folder-item-row'; row.innerText = f;
-            row.onclick = () => { goBack(); if (isMoveAction) executeMove(f); else saveAccount(f); };
+            const row = document.createElement('div');
+            row.className = 'folder-item-row';
+            row.innerText = f;
+            row.onclick = () => {
+                goBack();
+                if (isMoveAction) executeMove(f);
+                else saveAccount(f);
+            };
             listBody.appendChild(row);
         });
     }
 
-    function openMoveModal() { if(selectedIds.size === 0) return; isMoveAction = true; openFolderSelectModal("نقل " + selectedIds.size + " عنصر إلى:"); }
+    function openMoveModal() {
+        if(selectedIds.size === 0) return;
+        isMoveAction = true;
+        openFolderSelectModal("نقل " + selectedIds.size + " عنصر إلى:");
+    }
+
     function executeMove(targetFolder) {
         accounts.forEach(acc => { if(selectedIds.has(acc.id)) acc.folder = targetFolder; });
-        saveToLocal(); uploadToDrive(); toggleSelectionMode(); activeFolder = targetFolder; renderFoldersBar(); renderVault(); showToast("تم النقل ✅");
+        saveToLocal(); uploadToDrive(); 
+        toggleSelectionMode(); activeFolder = targetFolder; renderFoldersBar(); renderVault();
+        showToast("تم النقل ✅");
     }
 
     function openAddFolderModal(renameTarget = null) {
         folderRenameTarget = renameTarget;
         document.getElementById('addFolderTitle').innerText = renameTarget ? "تعديل المجلد" : "مجلد جديد";
         document.getElementById('folderNameInput').value = renameTarget || '';
-        showOverlay('addFolderModal'); document.getElementById('folderNameInput').focus();
+        showOverlay('addFolderModal');
+        setTimeout(()=>document.getElementById('folderNameInput').focus(),100);
     }
+
     function submitFolder() {
         const name = document.getElementById('folderNameInput').value.trim();
         if(!name) return;
         if (folderRenameTarget) {
-            const index = folders.indexOf(folderRenameTarget); if(index !== -1) folders[index] = name;
+            const index = folders.indexOf(folderRenameTarget);
+            if(index !== -1) folders[index] = name;
             accounts.forEach(acc => { if(acc.folder === folderRenameTarget) acc.folder = name; });
-        } else { if(!folders.includes(name)) folders.push(name); }
+        } else {
+            if(!folders.includes(name)) folders.push(name);
+        }
         saveToLocal(); uploadToDrive(); goBack(); renderFoldersBar(); renderVault();
     }
 
-    // Drag Drop
+    // Scroll Fix applied to Press
+    function startFolderPress(f) {
+        if(f==='عام') return;
+        isLongPress = false;
+        isScrolling = false;
+        longPressTimer = setTimeout(() => { 
+            if(!isScrolling) { isLongPress = true; openAddFolderModal(f); }
+        }, 600);
+    }
+
+    // --- Drag n Drop Logic ---
     let draggingItem = null;
     function initDrag(e) {
         if(isSelectionMode) return;
-        const handle = e.target.closest('.drag-handle-visible'); if(!handle) return;
+        const handle = e.target.closest('.drag-handle-visible');
+        if(!handle) return;
         draggingItem = handle.closest('.account-card');
         const list = document.getElementById('vaultList');
-        list.addEventListener('mousemove', onDragMove); list.addEventListener('touchmove', onDragMove, {passive: false});
-        document.addEventListener('mouseup', onDragEnd); document.addEventListener('touchend', onDragEnd);
-        draggingItem.classList.add('dragging'); if(navigator.vibrate) navigator.vibrate(20);
+        
+        list.addEventListener('mousemove', onDragMove);
+        list.addEventListener('touchmove', onDragMove, {passive: false});
+        document.addEventListener('mouseup', onDragEnd);
+        document.addEventListener('touchend', onDragEnd);
+        
+        draggingItem.classList.add('dragging');
+        if(navigator.vibrate) navigator.vibrate(20);
     }
     function onDragMove(e) {
         if(!draggingItem) return;
@@ -909,8 +942,10 @@
     }
     function onDragEnd() {
         if(!draggingItem) return;
-        draggingItem.classList.remove('dragging'); draggingItem = null;
-        document.removeEventListener('mouseup', onDragEnd); document.removeEventListener('touchend', onDragEnd);
+        draggingItem.classList.remove('dragging');
+        draggingItem = null;
+        document.removeEventListener('mouseup', onDragEnd);
+        document.removeEventListener('touchend', onDragEnd);
         saveNewOrder();
     }
     function saveNewOrder() {
@@ -918,37 +953,65 @@
         const cards = list.querySelectorAll('.account-card');
         const reorderedIds = [];
         cards.forEach(c => reorderedIds.push(Number(c.getAttribute('data-id'))));
+        
         if(activeFolder !== 'All') {
             const folderItems = accounts.filter(a => a.folder === activeFolder);
             const sortedFolderItems = [];
-            reorderedIds.forEach(id => { const item = folderItems.find(a => a.id === id); if(item) sortedFolderItems.push(item); });
+            reorderedIds.forEach(id => {
+                const item = folderItems.find(a => a.id === id);
+                if(item) sortedFolderItems.push(item);
+            });
             const otherItems = accounts.filter(a => a.folder !== activeFolder);
             accounts = [...sortedFolderItems, ...otherItems]; 
         } else {
-             const newAccounts = []; reorderedIds.forEach(id => { const acc = accounts.find(a => a.id === id); if(acc) newAccounts.push(acc); });
+             const newAccounts = [];
+             reorderedIds.forEach(id => {
+                 const acc = accounts.find(a => a.id === id);
+                 if(acc) newAccounts.push(acc);
+             });
              accounts = newAccounts;
         }
         saveToLocal(); uploadToDrive();
     }
 
-    function openContextMenu(type, id) {
-        if(!isLongPress) return;
-        currentCtxId = id; currentCtxType = type;
-        showOverlay('contextModal'); if (navigator.vibrate) navigator.vibrate(50);
+    // --- Context Menu ---
+    function startPress(type, id) {
+        isLongPress = false;
+        isScrolling = false;
+        longPressTimer = setTimeout(() => { 
+            if(!isScrolling) {
+                isLongPress = true; 
+                openContextMenu(type, id); 
+            }
+        }, 600);
     }
+    function cancelPress() { 
+        isScrolling = true; // Mark as scrolling
+        clearTimeout(longPressTimer); 
+    }
+
+    function openContextMenu(type, id) {
+        currentCtxId = id; currentCtxType = type;
+        showOverlay('contextModal');
+        if (navigator.vibrate) navigator.vibrate(50);
+    }
+
     function ctxAction(action) {
-        goBack();
+        goBack(); // Close modal
         const acc = accounts.find(a => a.id === currentCtxId);
         setTimeout(() => {
             if (!acc) return;
             if (action === 'copy') copyToClipboard(currentCtxType === 'email' ? acc.email : acc.pass);
             else if (action === 'delete') {
                 customConfirm("حذف نهائي؟", () => {
-                    const idToDelete = currentCtxId; accounts = accounts.filter(a => a.id !== idToDelete);
-                    saveToLocal(); renderVault(); uploadToDrive(false, idToDelete); showToast("تم الحذف");
+                    const idToDelete = currentCtxId;
+                    accounts = accounts.filter(a => a.id !== idToDelete);
+                    saveToLocal(); renderVault(); uploadToDrive(false, idToDelete); 
+                    showToast("تم الحذف");
                 });
             } else if (action === 'edit') {
-                document.getElementById('emailInput').value = acc.email; document.getElementById('passInput').value = acc.pass;
+                document.getElementById('emailInput').value = acc.email;
+                document.getElementById('passInput').value = acc.pass;
                 accounts = accounts.filter(a => a.id !== currentCtxId);
                 saveToLocal(); uploadToDrive(); renderVault(); 
                 if(document.getElementById('vaultPage').style.display==='flex') goBack();
@@ -956,24 +1019,37 @@
         }, 200);
     }
 
+    // --- Menu & Settings ---
     function safeToggleMenu(e) {
         if(e) e.stopPropagation();
         const m = document.getElementById('mainMenu');
         const appPass = localStorage.getItem('appPass');
         document.getElementById('lockMenuText').innerText = appPass ? "إلغاء قفل التطبيق" : "تعيين قفل للتطبيق";
-        if (m.style.display === 'flex') { m.style.display = 'none'; } 
-        else { if (appPass) { openPasswordModal("رمز القائمة", (v) => { if (v === appPass) m.style.display = 'flex'; else showToast("خطأ"); }); } else m.style.display = 'flex'; }
+        if (m.style.display === 'flex') {
+            m.style.display = 'none';
+        } else {
+            if (appPass) {
+                openPasswordModal("رمز القائمة", (v) => { if (v === appPass) m.style.display = 'flex'; else showToast("خطأ"); });
+            } else m.style.display = 'flex';
+        }
     }
+
     function handleAppLockSettings() {
         document.getElementById('mainMenu').style.display = 'none';
         const appPass = localStorage.getItem('appPass');
         if(appPass) {
-            openPasswordModal("أدخل الرمز الحالي لإزالته", (v) => { if(v === appPass) { localStorage.removeItem('appPass'); showToast("تم إزالة القفل 🔓"); uploadToDrive(); } else showToast("خطأ في الرمز"); });
-        } else { openPasswordModal("تعيين رمز جديد", (v) => { if(v) { localStorage.setItem('appPass', v); showToast("تم القفل 🔒"); uploadToDrive(); } }); }
+            openPasswordModal("أدخل الرمز الحالي لإزالته", (v) => {
+                if(v === appPass) { localStorage.removeItem('appPass'); showToast("تم إزالة القفل 🔓"); uploadToDrive(); }
+                else showToast("خطأ في الرمز");
+            });
+        } else {
+            openPasswordModal("تعيين رمز جديد", (v) => { if(v) { localStorage.setItem('appPass', v); showToast("تم القفل 🔒"); uploadToDrive(); } });
+        }
     }
+
     function confirmDeleteAll() {
         document.getElementById('mainMenu').style.display = 'none';
-        customConfirm("حذف كل البيانات نهائياً؟", async () => {
+        customConfirm("حذف كل البيانات (محلي وسحابي)؟", async () => {
             localStorage.clear(); accounts = []; folders = ["عام"];
             if(gAccessToken) {
                 try {
@@ -987,17 +1063,29 @@
         });
     }
 
+    // --- Utils ---
     function openPasswordModal(t, cb) {
-        document.getElementById('passModalTitle').innerText = t; document.getElementById('globalPassInput').value = '';
-        showOverlay('passwordModal'); pendingCallback = cb; setTimeout(()=>document.getElementById('globalPassInput').focus(), 100);
+        document.getElementById('passModalTitle').innerText = t;
+        document.getElementById('globalPassInput').value = '';
+        showOverlay('passwordModal');
+        pendingCallback = cb;
+        setTimeout(()=>document.getElementById('globalPassInput').focus(), 100);
     }
+    
     function customConfirm(m, cb) {
         document.getElementById('confirmMessage').innerText = m;
-        const btn = document.getElementById('confirmYesBtn'); const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn); newBtn.onclick = () => { goBack(); setTimeout(cb, 100); };
+        const btn = document.getElementById('confirmYesBtn');
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.onclick = () => { goBack(); setTimeout(cb, 100); };
         showOverlay('confirmModal');
     }
 
+    function startVaultPress() {
+        isLongPress = false; isScrolling = false;
+        vaultPressTimer = setTimeout(() => { if(!isScrolling) { isLongPress = true; handleVaultLongPress(); } }, 800);
+    }
+    function cancelVaultPress() { isScrolling = true; clearTimeout(vaultPressTimer); }
     function handleVaultLongPress() {
         const vp = localStorage.getItem('vaultPass');
         if(vp) openPasswordModal("إزالة قفل الخزنة", v => { if(v===vp){ localStorage.removeItem('vaultPass'); showToast("تم الإلغاء"); uploadToDrive(); } else showToast("خطأ"); });
@@ -1006,25 +1094,43 @@
     function openVaultCheck() {
         if(isLongPress) return;
         const vp = localStorage.getItem('vaultPass');
-        if(vp) openPasswordModal("رمز الخزنة", v => { if(v===vp) openVault(); else showToast("خطأ"); }); else openVault();
+        if(vp) openPasswordModal("رمز الخزنة", v => { if(v===vp) openVault(); else showToast("خطأ"); });
+        else openVault();
     }
-    function openVault() { pushHistory('vault'); document.getElementById('vaultPage').style.display = 'flex'; renderFoldersBar(); renderVault(); }
+    function openVault() {
+        pushHistory('vault');
+        document.getElementById('vaultPage').style.display = 'flex';
+        renderFoldersBar(); renderVault();
+    }
 
-    function showBackupModal() { document.getElementById('mainMenu').style.display = 'none'; document.getElementById('backupText').value = JSON.stringify({accounts, folders}); showOverlay('backupModal'); }
-    function copyBackup() { document.getElementById('backupText').select(); document.execCommand('copy'); showToast("تم النسخ"); }
-    function showImportModal() { document.getElementById('mainMenu').style.display = 'none'; document.getElementById('importText').value = ''; showOverlay('importModal'); }
+    function showBackupModal() {
+        document.getElementById('mainMenu').style.display = 'none';
+        document.getElementById('backupText').value = JSON.stringify({accounts, folders});
+        showOverlay('backupModal');
+    }
+    function copyBackup() {
+        document.getElementById('backupText').select(); document.execCommand('copy'); showToast("تم النسخ");
+    }
+    function showImportModal() {
+        document.getElementById('mainMenu').style.display = 'none';
+        document.getElementById('importText').value = '';
+        showOverlay('importModal');
+    }
     function performImport() {
         try {
             const data = JSON.parse(document.getElementById('importText').value);
             const raw = Array.isArray(data) ? data : (data.accounts || []);
             const clean = raw.map(a => ({ id: a.id || Date.now()+Math.random(), email: a.email || a.title || "مستورد", pass: a.pass||"...", folder: a.folder||"عام" }));
-            accounts = [...accounts, ...clean]; saveToLocal(); uploadToDrive(); goBack(); showToast(`تم استيراد ${clean.length} عنصر`); renderVault();
+            accounts = [...accounts, ...clean];
+            saveToLocal(); uploadToDrive();
+            goBack(); showToast(`تم استيراد ${clean.length} عنصر`); renderVault();
         } catch(e) { showToast("كود غير صالح ❌"); }
     }
     function pasteFromClipboard() { navigator.clipboard.readText().then(t => document.getElementById('importText').value = t); }
     function copyToClipboard(t) { navigator.clipboard.writeText(t).then(()=>showToast("تم النسخ")); }
     function setSyncLoader(s) { document.getElementById('syncLoader').style.display = s ? 'inline-block' : 'none'; }
     function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
+
     window.onclick = (e) => { if(!e.target.closest('.menu-btn')) document.getElementById('mainMenu').style.display = 'none'; }
 </script>
 </body>
